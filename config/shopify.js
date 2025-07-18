@@ -1,9 +1,8 @@
 const axios = require('axios');
 const config = require('./config');
 
-// Get the current environment
-const env = process.env.NODE_ENV || 'development';
-const currentConfig = config[env];
+// Get the current configuration
+const currentConfig = config;
 
 // Shopify GraphQL endpoint
 const SHOPIFY_GRAPHQL_URL = `https://${currentConfig.shopify.shopName}/admin/api/${currentConfig.shopify.apiVersion}/graphql.json`;

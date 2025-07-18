@@ -122,7 +122,7 @@ const webhookToSubscribe = [
         input: {
             topic: "DRAFT_ORDERS_CREATE",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -131,7 +131,7 @@ const webhookToSubscribe = [
         input: {
             topic: "DRAFT_ORDERS_UPDATE",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -140,7 +140,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_HOLDS_ADDED",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -149,7 +149,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_CANCELLATION_REQUEST_ACCEPTED",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -158,7 +158,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_CANCELLATION_REQUEST_REJECTED",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -167,7 +167,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_CANCELLATION_REQUEST_SUBMITTED",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -176,7 +176,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_FULFILLMENT_REQUEST_ACCEPTED",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -185,7 +185,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_FULFILLMENT_REQUEST_REJECTED",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -194,7 +194,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_FULFILLMENT_REQUEST_SUBMITTED",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -203,7 +203,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_FULFILLMENT_SERVICE_FAILED_TO_COMPLETE",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -212,7 +212,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_HOLD_RELEASED",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -221,7 +221,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_LINE_ITEMS_PREPARED_FOR_LOCAL_DELIVERY",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -230,7 +230,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_MERGED",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -239,7 +239,7 @@ const webhookToSubscribe = [
         input: {
             topic: "ULFILLMENT_ORDERS_MOVED",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -248,7 +248,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_ORDER_ROUTING_COMPLETE",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -257,7 +257,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_PLACED_ON_HOLD",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -266,7 +266,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_RESCHEDULED",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -275,7 +275,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_SCHEDULED_FULFILLMENT_ORDER_READY",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -284,7 +284,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENT_ORDERS_SPLIT",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -293,7 +293,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENTS_CREATE",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -302,7 +302,7 @@ const webhookToSubscribe = [
         input: {
             topic: "FULFILLMENTS_UPDATE",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -311,16 +311,16 @@ const webhookToSubscribe = [
         input: {
             topic: "ORDER_TRANSACTIONS_CREATE",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
     },
     {
         input: {
-            topic: "ORDERS_CANCELLED",
+            topic: "ORDER_TRANSACTIONS_UPDATE",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -329,16 +329,7 @@ const webhookToSubscribe = [
         input: {
             topic: "ORDERS_CREATE",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
-                format: "JSON",
-            }
-        }
-    },
-    {
-        input: {
-            topic: "ORDERS_EDITED",
-            webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -347,7 +338,7 @@ const webhookToSubscribe = [
         input: {
             topic: "ORDERS_DELETE",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -356,7 +347,7 @@ const webhookToSubscribe = [
         input: {
             topic: "ORDERS_FULFILLED",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -365,25 +356,7 @@ const webhookToSubscribe = [
         input: {
             topic: "ORDERS_PAID",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
-                format: "JSON",
-            }
-        }
-    },
-    {
-        input: {
-            topic: "ORDERS_PARTIALLY_FULFILLED",
-            webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
-                format: "JSON",
-            }
-        }
-    },
-    {
-        input: {
-            topic: "ORDERS_RISK_ASSESSMENT_CHANGED",
-            webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }
@@ -392,7 +365,88 @@ const webhookToSubscribe = [
         input: {
             topic: "ORDERS_UPDATED",
             webhookSubscription: {
-                callbackUrl: `${config.development.shopify.SHOPIFY_WEBHOOK_URL}`,
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
+                format: "JSON",
+            }
+        }
+    },
+    {
+        input: {
+            topic: "PRODUCTS_CREATE",
+            webhookSubscription: {
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
+                format: "JSON",
+            }
+        }
+    },
+    {
+        input: {
+            topic: "PRODUCTS_DELETE",
+            webhookSubscription: {
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
+                format: "JSON",
+            }
+        }
+    },
+    {
+        input: {
+            topic: "PRODUCTS_UPDATE",
+            webhookSubscription: {
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
+                format: "JSON",
+            }
+        }
+    },
+    {
+        input: {
+            topic: "REFUNDS_CREATE",
+            webhookSubscription: {
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
+                format: "JSON",
+            }
+        }
+    },
+    {
+        input: {
+            topic: "SHOP_UPDATE",
+            webhookSubscription: {
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
+                format: "JSON",
+            }
+        }
+    },
+    {
+        input: {
+            topic: "THEMES_CREATE",
+            webhookSubscription: {
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
+                format: "JSON",
+            }
+        }
+    },
+    {
+        input: {
+            topic: "THEMES_DELETE",
+            webhookSubscription: {
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
+                format: "JSON",
+            }
+        }
+    },
+    {
+        input: {
+            topic: "THEMES_PUBLISH",
+            webhookSubscription: {
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
+                format: "JSON",
+            }
+        }
+    },
+    {
+        input: {
+            topic: "THEMES_UPDATE",
+            webhookSubscription: {
+                callbackUrl: `${config.shopify.SHOPIFY_WEBHOOK_URL}`,
                 format: "JSON",
             }
         }

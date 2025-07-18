@@ -1,9 +1,8 @@
 const axios = require('axios');
 const config = require('./config');
 
-// Get the current environment
-const env = process.env.NODE_ENV || 'development';
-const currentConfig = config[env];
+// Get the current configuration
+const currentConfig = config;
 
 // AirTable error codes mapping
 const AIRTABLE_ERROR_CODES = {
