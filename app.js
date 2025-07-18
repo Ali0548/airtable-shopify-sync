@@ -21,7 +21,7 @@ const initializeApp = async () => {
     // Connect to MongoDB
     console.log('env', process.env.MONGODB_URI);
     await database.connect();
-    
+
     // Middleware
     app.use(helmet());
     app.use(cors());
@@ -38,12 +38,12 @@ const initializeApp = async () => {
     const shopifyRoutes = require('./routes/shopify');
     const airTableRoutes = require('./routes/airTable');
     const syncRoutes = require('./routes/sync');
-   app.get('/', (req, res) => {
-    res.json({
-      success: true,
-      message: 'Server is running'
+    app.get('/', (req, res) => {
+      res.json({
+        success: true,
+        message: 'Server is running'
+      });
     });
-   });
     app.use('/', indexRoutes);
     app.get('/check', async (req, res) => {
       const order = await OrderModel.find({}).lean();
@@ -82,7 +82,7 @@ const initializeApp = async () => {
       console.log(`📊 Database: ${database.isConnected() ? 'Connected' : 'Disconnected'}`);
       console.log(`🛍️ Shopify API: /api/shopify/orders`);
       console.log(`🔄 Sync API: /api/sync`);
-      
+
       // Start cron service
       cronService.start();
       console.log(`⏰ Cron service started - sync job scheduled every 6 hours`);
