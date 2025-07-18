@@ -47,15 +47,47 @@ const initializeApp = async () => {
   const airTableRoutes = require('./routes/airTable');
   const syncRoutes = require('./routes/sync');
   
+  // Root route
   app.get('/', (req, res) => {
     res.json({
       success: true,
-      message: 'Server is running'
+      message: 'Server is running',
+      endpoints: {
+        health: '/health',
+        check: '/check',
+        test: '/test',
+        users: '/api/users',
+        shopify: '/api/shopify',
+        airtable: '/api/airtable',
+        sync: '/api/sync'
+      }
     });
   });
   
-  app.use('/', indexRoutes);
+  // Test route for debugging
+  app.get('/test', (req, res) => {
+    res.json({
+      success: true,
+      message: 'Test route is working!',
+      timestamp: new Date().toISOString(),
+      headers: req.headers,
+      url: req.url,
+      method: req.method
+    });
+  });
   
+  // Health check route
+  app.get('/health', (req, res) => {
+    res.json({
+      success: true,
+      message: 'Server is healthy',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || 'development'
+    });
+  });
+  
+  // Database check route
   app.get('/check', async (req, res) => {
     try {
       if (database.isConnected()) {
@@ -80,10 +112,14 @@ const initializeApp = async () => {
     }
   });
   
+  // API routes
   app.use('/api/users', userRoutes);
   app.use('/api/shopify', shopifyRoutes);
   app.use('/api/airtable', airTableRoutes);
   app.use('/api/sync', syncRoutes);
+  
+  // Additional index routes (if any)
+  app.use('/', indexRoutes);
   
   // Error handling middleware
   app.use((err, req, res, next) => {
@@ -97,9 +133,12 @@ const initializeApp = async () => {
 
   // 404 handler
   app.use('*', (req, res) => {
+    console.log('404 - Route not found:', req.method, req.url);
     res.status(404).json({
       success: false,
-      message: 'Route not found'
+      message: 'Route not found',
+      path: req.url,
+      method: req.method
     });
   });
 
