@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const database = require('./config/database');
 const cronService = require('./services/cronService');
 const OrderModel = require('./models/Order');
+const mongoose = require('mongoose'); // Added for mongoose.connection.readyState
 
 const app = express();
 
@@ -95,23 +96,56 @@ app.get('/health', (req, res) => {
 // Database check route
 app.get('/check', async (req, res) => {
   try {
+    console.log('🔍 Checking database connection...');
+    console.log('Database connection state:', database.isConnected());
+    console.log('Mongoose ready state:', mongoose.connection.readyState);
+    console.log('MONGODB_URI exists:', !!process.env.MONGODB_URI);
+    
     if (database.isConnected()) {
       const order = await OrderModel.find({}).lean();
       res.json({
         success: true,
         message: 'Server is running',
+        databaseStatus: 'Connected',
+        orderCount: order?.length || 0,
         order: order?.map(x => x?.fulfillments?.map(y => y?.events?.nodes))
       });
     } else {
-      res.json({
-        success: true,
-        message: 'Server is running (database not connected)'
-      });
+      // Try to reconnect
+      try {
+        console.log('🔄 Attempting to reconnect to database...');
+        await database.connect();
+        if (database.isConnected()) {
+          const order = await OrderModel.find({}).lean();
+          res.json({
+            success: true,
+            message: 'Server is running (reconnected)',
+            databaseStatus: 'Reconnected',
+            orderCount: order?.length || 0,
+            order: order?.map(x => x?.fulfillments?.map(y => y?.events?.nodes))
+          });
+        } else {
+          res.json({
+            success: true,
+            message: 'Server is running (database not connected)',
+            databaseStatus: 'Failed to connect',
+            error: 'Database connection failed'
+          });
+        }
+      } catch (reconnectError) {
+        res.json({
+          success: true,
+          message: 'Server is running (database not connected)',
+          databaseStatus: 'Connection failed',
+          error: reconnectError.message
+        });
+      }
     }
   } catch (error) {
     res.json({
       success: true,
       message: 'Server is running (database error)',
+      databaseStatus: 'Error',
       error: error.message
     });
   }
