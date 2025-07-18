@@ -4,9 +4,6 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const env = process.env.NODE_ENV || 'development';
-console.log('======>', env);
-console.log('======>', config);
-console.log('======>', config[env]);
 const dbConfig = config[env].database;
 
 class Database {
