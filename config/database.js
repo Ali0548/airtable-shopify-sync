@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const config = require('./config');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const env = process.env.NODE_ENV || 'development';
 const dbConfig = config[env].database;
