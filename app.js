@@ -8,7 +8,7 @@ const morgan = require('morgan');
 const database = require('./config/database');
 const cronService = require('./services/cronService');
 const OrderModel = require('./models/Order');
-const mongoose = require('mongoose'); // Added for mongoose.connection.readyState
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -25,26 +25,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Static files
 app.use(express.static('public'));
 
-// Initialize database connection
-const initializeApp = async () => {
-  // Try to connect to MongoDB (but don't fail if it doesn't work)
-  console.log('env', process.env.MONGODB_URI);
-  if (process.env.MONGODB_URI) {
-    try {
-      await database.connect();
-      console.log('✅ MongoDB connected successfully');
-    } catch (dbError) {
-      console.warn('⚠️ MongoDB connection failed, continuing without database:', dbError.message);
-    }
-  } else {
-    console.warn('⚠️ No MONGODB_URI provided, skipping database connection');
-  }
-};
-
-// Initialize database on startup
-initializeApp().catch(error => {
-  console.error('❌ Failed to initialize database:', error);
-});
+// Start MongoDB connection
+if (process.env.MONGODB_URI) {
+  console.log('Connecting to MongoDB...');
+  database.connect().then(() => {
+    console.log('✅ MongoDB connected successfully');
+  }).catch((error) => {
+    console.warn('⚠️ MongoDB connection failed:', error.message);
+  });
+} else {
+  console.warn('⚠️ No MONGODB_URI provided');
+}
 
 // Routes
 const indexRoutes = require('./routes/index');
@@ -52,7 +43,7 @@ const userRoutes = require('./routes/users');
 const shopifyRoutes = require('./routes/shopify');
 const airTableRoutes = require('./routes/airTable');
 const syncRoutes = require('./routes/sync');
-database.connect();
+
 // Root route
 app.get('/', (req, res) => {
   res.json({
@@ -96,11 +87,6 @@ app.get('/health', (req, res) => {
 // Database check route
 app.get('/check', async (req, res) => {
   try {
-    console.log('🔍 Checking database connection...');
-    console.log('Database connection state:', database.isConnected());
-    console.log('Mongoose ready state:', mongoose.connection.readyState);
-    console.log('MONGODB_URI exists:', !!process.env.MONGODB_URI);
-    
     if (database.isConnected()) {
       const order = await OrderModel.find({}).lean();
       res.json({
@@ -111,35 +97,11 @@ app.get('/check', async (req, res) => {
         order: order?.map(x => x?.fulfillments?.map(y => y?.events?.nodes))
       });
     } else {
-      // Try to reconnect
-      try {
-        console.log('🔄 Attempting to reconnect to database...');
-        await database.connect();
-        if (database.isConnected()) {
-          const order = await OrderModel.find({}).lean();
-          res.json({
-            success: true,
-            message: 'Server is running (reconnected)',
-            databaseStatus: 'Reconnected',
-            orderCount: order?.length || 0,
-            order: order?.map(x => x?.fulfillments?.map(y => y?.events?.nodes))
-          });
-        } else {
-          res.json({
-            success: true,
-            message: 'Server is running (database not connected)',
-            databaseStatus: 'Failed to connect',
-            error: 'Database connection failed'
-          });
-        }
-      } catch (reconnectError) {
-        res.json({
-          success: true,
-          message: 'Server is running (database not connected)',
-          databaseStatus: 'Connection failed',
-          error: reconnectError.message
-        });
-      }
+      res.json({
+        success: true,
+        message: 'Server is running (database not connected)',
+        databaseStatus: 'Not connected'
+      });
     }
   } catch (error) {
     res.json({
