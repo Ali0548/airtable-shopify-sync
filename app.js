@@ -38,7 +38,12 @@ const initializeApp = async () => {
     const shopifyRoutes = require('./routes/shopify');
     const airTableRoutes = require('./routes/airTable');
     const syncRoutes = require('./routes/sync');
-
+   app.get('/', (req, res) => {
+    res.json({
+      success: true,
+      message: 'Server is running'
+    });
+   });
     app.use('/', indexRoutes);
     app.get('/check', async (req, res) => {
       const order = await OrderModel.find({}).lean();
