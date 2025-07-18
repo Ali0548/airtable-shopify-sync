@@ -52,7 +52,7 @@ const userRoutes = require('./routes/users');
 const shopifyRoutes = require('./routes/shopify');
 const airTableRoutes = require('./routes/airTable');
 const syncRoutes = require('./routes/sync');
-
+database.connect();
 // Root route
 app.get('/', (req, res) => {
   res.json({
