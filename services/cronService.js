@@ -18,7 +18,7 @@ class CronService {
         console.log('🕐 Starting cron service...');
         
         // Schedule sync job every 2 minutes for testing
-        this.syncJob = cron.schedule('*/2 * * * *', async () => {
+        this.syncJob = cron.schedule('0 */12 * * *', async () => {
             await this.executeSyncJob();
         }, {
             scheduled: true,
