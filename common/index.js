@@ -63,7 +63,7 @@ const getDeliveredAtInDays = (fulfillments) => {
 
 const checkIfOrderDeliveryIsFailed = (fulfillments) => {
     const possibleStatus = ['FAILED', 'FAILURE'];
-    const failedCount = 0;
+    let failedCount = 0;
     fulfillments?.forEach(x => {
         const events = x?.events?.nodes;
         const lastIndexOfArray = events?.length - 1;
