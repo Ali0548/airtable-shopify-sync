@@ -350,6 +350,7 @@ class SyncController {
     }
 
     static async startSyncing() {
+       
         try {
             const batchSize = 150;
             const { errors, data, success } = await shopifyWrapper.getAllOrders(parseInt(batchSize));

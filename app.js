@@ -6,11 +6,16 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const database = require('./config/database');
-const cronService = require('./services/cronService');
+const cron = require('node-cron');
+const SyncController = require('./controllers/SyncController');
 const OrderModel = require('./models/Order');
 const mongoose = require('mongoose');
 
 const app = express();
+
+// Global variable to track cron job status
+let cronJobRunning = false;
+let syncCronJob = null;
 
 console.log('process.env.PORT', process.env.PORT);
 console.log('process.env.NODE_ENV', process.env.NODE_ENV);
@@ -30,6 +35,50 @@ if (process.env.MONGODB_URI) {
   console.log('Connecting to MongoDB...');
   database.connect().then(() => {
     console.log('✅ MongoDB connected successfully');
+    
+    // Start cron job immediately after MongoDB connection
+    if (!process.env.VERCEL && !syncCronJob) {
+      console.log('🕐 Starting cron job...');
+      SyncController.startSyncing().then(result => {
+        console.log('✅ Cron job started - sync scheduled every 3 hours');
+      }).catch(error => {
+        console.error('❌ Cron job failed to start:', error);
+      });
+              // Schedule sync job every 3 hours
+        syncCronJob = cron.schedule('0 */3 * * *', async () => {
+        // Check if another sync is already running
+        if (cronJobRunning) {
+          console.log('⚠️ Sync job is already running, skipping this execution.');
+          return;
+        }
+
+        cronJobRunning = true;
+        console.log('🔄 Executing scheduled sync job...');
+
+        try {
+          const result = await SyncController.startSyncing();
+          
+          if (result && result.success) {
+            console.log('✅ Scheduled sync job completed successfully:', result.message);
+          } else {
+            console.error('❌ Scheduled sync job failed:', result?.message || 'Unknown error');
+          }
+        } catch (error) {
+          console.error('❌ Critical error in scheduled sync job:', error);
+        } finally {
+          cronJobRunning = false;
+        }
+      }, {
+        scheduled: true,
+        timezone: "UTC"
+      });
+
+      console.log('⏰ Cron job started - sync scheduled every 20 minutes');
+    } else if (process.env.VERCEL) {
+      console.log('⏰ Cron job skipped - running on Vercel');
+    } else if (syncCronJob) {
+      console.log('⏰ Cron job already running - skipping duplicate');
+    }
   }).catch((error) => {
     console.warn('⚠️ MongoDB connection failed:', error.message);
   });
@@ -93,6 +142,8 @@ app.get('/check', async (req, res) => {
         success: true,
         message: 'Server is running',
         databaseStatus: 'Connected',
+        cronJobStatus: syncCronJob ? 'Running' : 'Not running',
+        syncInProgress: cronJobRunning,
         orderCount: order?.length || 0,
         order: order?.map(x => x?.fulfillments?.map(y => y?.events?.nodes))
       });
@@ -100,7 +151,9 @@ app.get('/check', async (req, res) => {
       res.json({
         success: true,
         message: 'Server is running (database not connected)',
-        databaseStatus: 'Not connected'
+        databaseStatus: 'Not connected',
+        cronJobStatus: 'Not running',
+        syncInProgress: false
       });
     }
   } catch (error) {
@@ -108,6 +161,8 @@ app.get('/check', async (req, res) => {
       success: true,
       message: 'Server is running (database error)',
       databaseStatus: 'Error',
+      cronJobStatus: 'Not running',
+      syncInProgress: false,
       error: error.message
     });
   }
@@ -153,12 +208,11 @@ if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
     console.log(`🛍️ Shopify API: /api/shopify/orders`);
     console.log(`🔄 Sync API: /api/sync`);
 
-    // Start cron service only if database is connected and not on Vercel
-    if (database.isConnected() && !process.env.VERCEL) {
-      cronService.start();
-      console.log(`⏰ Cron service started - sync job scheduled every 6 hours`);
+    // Cron job status
+    if (database.isConnected() && !process.env.VERCEL && syncCronJob) {
+      console.log(`⏰ Cron job is running - sync scheduled every 3 hours`);
     } else {
-      console.log(`⏰ Cron service skipped - database not connected or on Vercel`);
+      console.log(`⏰ Cron job not running - database not connected or on Vercel`);
     }
   });
 }

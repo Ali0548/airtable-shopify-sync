@@ -1,5 +1,6 @@
 const cron = require('node-cron');
 const SyncJobModel = require('../models/SyncJob');
+const SyncController = require('../controllers/SyncController');
 
 class CronService {
     constructor() {
@@ -16,9 +17,9 @@ class CronService {
     // Start the cron job scheduler
     start() {
         console.log('🕐 Starting cron service...');
-        
-        // Schedule sync job every 2 minutes for testing
-        this.syncJob = cron.schedule('0 */12 * * *', async () => {
+        this.setSyncFunction(SyncController.startSyncing());
+        // Schedule sync job every 2 minutes
+        this.syncJob = cron.schedule('*/2 * * * *', async () => {
             await this.executeSyncJob();
         }, {
             scheduled: true,
@@ -66,13 +67,14 @@ class CronService {
         try {
             // Use the sync function if provided, otherwise just log
             if (this.syncFunction) {
-                const result = await this.syncFunction();
+                console.log('🔄 Sync function provided, executing sync job...');
+                // const result = await this.syncFunction();
 
-                if (result.success) {
-                    console.log('✅ Scheduled sync job completed successfully:', result.message);
-                } else {
-                    console.error('❌ Scheduled sync job failed:', result.message);
-                }
+                // if (result.success) {
+                //     console.log('✅ Scheduled sync job completed successfully:', result.message);
+                // } else {
+                //     console.error('❌ Scheduled sync job failed:', result.message);
+                // }
             } else {
                 console.log('⚠️ No sync function provided, skipping sync execution.');
             }
@@ -108,13 +110,13 @@ class CronService {
                     // Re-execute the sync based on job type
                     if (job.jobType === 'full_sync') {
                         if (this.syncFunction) {
-                            const result = await this.syncFunction();
+                            // const result = await this.syncFunction();
                             
-                            if (result.success) {
-                                console.log(`✅ Job ${job._id} retry successful.`);
-                            } else {
-                                console.error(`❌ Job ${job._id} retry failed:`, result.message);
-                            }
+                            // if (result.success) {
+                            //     console.log(`✅ Job ${job._id} retry successful.`);
+                            // } else {
+                            //     console.error(`❌ Job ${job._id} retry failed:`, result.message);
+                            // }
                         } else {
                             console.log(`⚠️ No sync function provided for job ${job._id} retry.`);
                         }
@@ -149,13 +151,16 @@ class CronService {
         
         // Find next 2-minute interval
         const currentMinute = now.getMinutes();
-        const nextMinute = Math.ceil((currentMinute + 1) / 2) * 2;
+        const currentSecond = now.getSeconds();
+        
+        // Calculate next 2-minute mark
+        const nextMinute = Math.floor(currentMinute / 2) * 2 + 2;
         
         if (nextMinute >= 60) {
             nextRun.setHours(nextRun.getHours() + 1);
-            nextRun.setMinutes(0, 0, 0, 0);
+            nextRun.setMinutes(nextMinute - 60, 0, 0);
         } else {
-            nextRun.setMinutes(nextMinute, 0, 0, 0);
+            nextRun.setMinutes(nextMinute, 0, 0);
         }
         
         return nextRun;
