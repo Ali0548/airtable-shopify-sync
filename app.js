@@ -39,35 +39,32 @@ if (process.env.MONGODB_URI) {
     // Start cron job immediately after MongoDB connection
     if (!process.env.VERCEL && !syncCronJob) {
       console.log('🕐 Starting cron job...');
-      SyncController.startSyncing().then(result => {
-        console.log('✅ Cron job started - sync scheduled every 3 hours');
-      }).catch(error => {
-        console.error('❌ Cron job failed to start:', error);
-      });
-              // Schedule sync job every 3 hours
-        syncCronJob = cron.schedule('0 */3 * * *', async () => {
+      // SyncController.startSyncing().then(result => {
+      //   console.log('✅ Cron job started - sync scheduled every 10 seconds');
+      // }).catch(error => {
+      //   console.error('❌ Cron job failed to start:', error);
+      // });
+      console.log('✅ Cron job started - sync scheduled every 10 seconds');
+              // Schedule sync job every 10 seconds
+        syncCronJob = cron.schedule('*/10 * * * * *', async () => {
+          // '0 */3 * * *'
         // Check if another sync is already running
-        if (cronJobRunning) {
-          console.log('⚠️ Sync job is already running, skipping this execution.');
-          return;
-        }
-
-        cronJobRunning = true;
+        
         console.log('🔄 Executing scheduled sync job...');
 
-        try {
-          const result = await SyncController.startSyncing();
+        // try {
+        //   const result = await SyncController.startSyncing();
           
-          if (result && result.success) {
-            console.log('✅ Scheduled sync job completed successfully:', result.message);
-          } else {
-            console.error('❌ Scheduled sync job failed:', result?.message || 'Unknown error');
-          }
-        } catch (error) {
-          console.error('❌ Critical error in scheduled sync job:', error);
-        } finally {
-          cronJobRunning = false;
-        }
+        //   if (result && result.success) {
+        //     console.log('✅ Scheduled sync job completed successfully:', result.message);
+        //   } else {
+        //     console.error('❌ Scheduled sync job failed:', result?.message || 'Unknown error');
+        //   }
+        // } catch (error) {
+        //   console.error('❌ Critical error in scheduled sync job:', error);
+        // } finally {
+        //   cronJobRunning = false;
+        // }
       }, {
         scheduled: true,
         timezone: "UTC"
@@ -210,7 +207,7 @@ if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
 
     // Cron job status
     if (database.isConnected() && !process.env.VERCEL && syncCronJob) {
-      console.log(`⏰ Cron job is running - sync scheduled every 3 hours`);
+      console.log(`⏰ Cron job is running - sync scheduled every 10 seconds`);
     } else {
       console.log(`⏰ Cron job not running - database not connected or on Vercel`);
     }
