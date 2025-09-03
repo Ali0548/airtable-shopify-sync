@@ -1,8 +1,9 @@
-const { transformedDbOrderToUpdateAirTableOrder, transformedDbOrderToCreateAirTableOrder, extractNumberAfterDash } = require("../common");
+const { transformedDbOrderToUpdateAirTableOrder, transformedDbOrderToCreateAirTableOrder, extractNumberAfterDash, getOrderNumber } = require("../common");
 const airTableWrapper = require("../config/airTable");
 const shopifyWrapper = require("../config/shopify");
 const OrderModel = require("../models/Order");
 const SyncJobModel = require("../models/SyncJob");
+const { getAllRecords } = require("../utils/getAllRecords");
 const { UpsertOrder } = require("./Order");
 
 const getAllTableDataByTableName = async (tableName) => {
@@ -16,6 +17,115 @@ const createRecord = async (tableName, records) => {
 };
 
 const syncAirTableWithDb = async () => {
+    try {
+        const allOrders = await OrderModel.find({});
+        const ordersToCreate = [];
+        const orderToUpsert = [];
+        const findAllRecords = await getAllRecords();
+        const records = findAllRecords?.data;
+        console.log("records", records?.length);
+        allOrders?.forEach(order => {
+            const orderNumber = getOrderNumber(order);
+            const record = records?.find(x => x?.fields?.['Order Number'] === orderNumber);
+            if(record) {   
+                orderToUpsert?.push(transformedDbOrderToUpdateAirTableOrder(order));
+            } else {
+                ordersToCreate?.push(transformedDbOrderToCreateAirTableOrder(order));
+            }
+            // if (order?.airTableRecordId) {
+            //     orderToUpsert?.push(transformedDbOrderToUpdateAirTableOrder(order));
+            // } else {
+            //     ordersToCreate?.push(transformedDbOrderToCreateAirTableOrder(order));
+            // }
+        });
+
+        let createResponse = null;
+        let upsertResponse = null;
+
+        // Batch create records (max 10 per request)
+        if (ordersToCreate?.length > 0) {
+            console.log(`🔄 Creating ${ordersToCreate.length} records in batches of 10...`);
+
+            const createBatches = [];
+            for (let i = 0; i < ordersToCreate.length; i += 10) {
+                createBatches.push(ordersToCreate.slice(i, i + 10));
+            }
+
+            const createResults = [];
+            for (let i = 0; i < createBatches.length; i++) {
+                console.log(`📦 Processing create batch ${i + 1}/${createBatches.length} (${createBatches[i].length} records)`);
+                const batchResult = await createRecord("VIVANTI LONDON ORDER TRACKING", createBatches[i]);
+                if (batchResult?.errors?.length === 0) {
+                    const batchResultData = await batchResult?.data?.records;
+                    for (const bRecord of batchResultData) {
+                        const order = await OrderModel.findOne({
+                            legacyResourceId: extractNumberAfterDash(bRecord?.fields?.['Order Number'])
+                        })
+                        if (order) {
+                            order.airTableRecordId = bRecord?.id;
+                            await order.save();
+                        }
+                    }
+                }
+                createResults.push(batchResult);
+
+                // Add small delay between batches to respect rate limits
+                if (i < createBatches.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+            }
+
+            createResponse = {
+                totalBatches: createBatches.length,
+                totalRecords: ordersToCreate.length,
+                results: createResults
+            };
+        }
+
+        // Batch upsert records (max 10 per request)
+        if (orderToUpsert?.length > 0) {
+            console.log(`🔄 Upserting ${orderToUpsert.length} records in batches of 10...`);
+
+            const upsertBatches = [];
+            for (let i = 0; i < orderToUpsert.length; i += 10) {
+                upsertBatches.push(orderToUpsert.slice(i, i + 10));
+            }
+
+            const upsertResults = [];
+            for (let i = 0; i < upsertBatches.length; i++) {
+                console.log(`📦 Processing upsert batch ${i + 1}/${upsertBatches.length} (${upsertBatches[i].length} records)`);
+                const batchResult = await upsertRecord("VIVANTI LONDON ORDER TRACKING", upsertBatches[i]);
+                upsertResults.push(batchResult);
+
+                // Add small delay between batches to respect rate limits
+                if (i < upsertBatches.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+            }
+
+            upsertResponse = {
+                totalBatches: upsertBatches.length,
+                totalRecords: orderToUpsert.length,
+                results: upsertResults
+            };
+        }
+
+
+        return {
+            success: true,
+            message: "Synced AirTable with DB",
+            createResponse,
+            upsertResponse
+        }
+    } catch (error) {
+        console.error('❌ Error in syncAirTableWithDb:', error);
+        return {
+            success: false,
+            message: error.message
+        }
+    }
+};
+const syncAirTableWithDbAdvance = async () => {
     try {
         const allOrders = await OrderModel.find({});
         const ordersToCreate = [];

@@ -140,22 +140,33 @@ const shopifyRoutes = require("./routes/shopify");
 const airTableRoutes = require("./routes/airTable");
 const syncRoutes = require("./routes/sync");
 const SyncingModel = require("./models/Syncing");
+const { getAllRecords } = require("./utils/getAllRecords");
 
 // Root route
-app.get("/", (req, res) => {
-  res.json({
-    success: true,
-    message: "Server is running",
-    endpoints: {
-      health: "/health",
-      check: "/check",
-      test: "/test",
-      users: "/api/users",
-      shopify: "/api/shopify",
-      airtable: "/api/airtable",
-      sync: "/api/sync",
-    },
-  });
+app.get("/", async (req, res) => {
+  try {
+    const allRecords = await getAllRecords();
+    res.json({
+      success: true,
+      message: "Server is running",
+      allRecords: allRecords?.data,
+      endpoints: {
+        health: "/health",
+        check: "/check",
+        test: "/test",
+        users: "/api/users",
+        shopify: "/api/shopify",
+        airtable: "/api/airtable",
+        sync: "/api/sync",
+      },
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "Error getting all records",
+      error: error.message,
+    });
+  }
 });
 
 // Test route for debugging
@@ -249,6 +260,9 @@ app.use("*", (req, res) => {
 // Only start server if not on Vercel (for local development)
 if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
   const PORT = process.env.PORT || 9090;
+  const checker = require("./test.json");
+  console.log("checker", checker?.records?.length);
+
   app.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
