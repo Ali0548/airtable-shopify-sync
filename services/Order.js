@@ -31,9 +31,6 @@ const UpsertOrder = async (orders) => {
               fulfillments: order.fulfillments,
               displayFulfillmentStatus: order.displayFulfillmentStatus,
               statusPageUrl: order.statusPageUrl,
-              airTableRecordId: null,
-              airTableTableName: null,
-              AirTableApiId: null
             },
             { 
               new: true, // Return the updated document
