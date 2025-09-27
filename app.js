@@ -30,101 +30,47 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Static files
 app.use(express.static("public"));
 
-// Start MongoDB connection
+const job = () => {
+  SyncController.startSyncing()
+  .then(async (result) => {
+    const syncing = await SyncingModel.create({
+      status: "completed",
+      startedAt: new Date(),
+      completedAt: new Date(),
+      duration: null,
+      errors: [],
+      metadata: {},
+    });
+    syncing.save();
+    console.log("✅ Cron job started - sync scheduled every 3 hours");
+  })
+  .catch(async (error) => {
+    const syncing = await SyncingModel.create({
+      status: "failed",
+      startedAt: new Date(),
+      completedAt: null,
+      duration: null,
+      errors: [],
+      metadata: {
+        error: error.message,
+      },
+    });
+    syncing.save();
+    console.error("❌ Cron job failed to start:", error);
+  });
+}
+
 if (process.env.MONGODB_URI) {
-  console.log("Connecting to MongoDB...");
   database
     .connect()
     .then(() => {
-      console.log("✅ MongoDB connected successfully");
-
-      // Start cron job immediately after MongoDB connection
-      if (!process.env.VERCEL && !syncCronJob) {
-        console.log("🕐 Starting cron job...");
-
-        SyncController.startSyncing()
-          .then(async (result) => {
-            const syncing = await SyncingModel.create({
-              status: "completed",
-              startedAt: new Date(),
-              completedAt: new Date(),
-              duration: null,
-              errors: [],
-              metadata: {},
-            });
-            syncing.save();
-            console.log("✅ Cron job started - sync scheduled every 3 hours");
-          })
-          .catch(async (error) => {
-            const syncing = await SyncingModel.create({
-              status: "failed",
-              startedAt: new Date(),
-              completedAt: null,
-              duration: null,
-              errors: [],
-              metadata: {
-                error: error.message,
-              },
-            });
-            syncing.save();
-            console.error("❌ Cron job failed to start:", error);
-          });
-        console.log("✅ Cron job started - sync scheduled every 3 hours");
-        // Schedule sync job every 10 seconds
-        syncCronJob = cron.schedule(
-          "0 */3 * * *",
-          async () => {
-            //
-            // Check if another sync is already running
-
-            console.log("🔄 Executing scheduled sync job...");
-
-            const syncing = await SyncingModel.create({
-              status: "running",
-              startedAt: new Date(),
-              completedAt: null,
-              duration: null,
-              errors: [],
-              metadata: {},
-            });
-            syncing.save();
-            try {
-              const result = await SyncController.startSyncing();
-              syncing.status = result.success ? "completed" : "failed";
-              syncing.completedAt = new Date();
-              syncing.duration = new Date() - new Date(syncing.startedAt);
-              syncing.save();
-              if (result && result.success) {
-                console.log(
-                  "✅ Scheduled sync job completed successfully:",
-                  result.message
-                );
-              } else {
-                console.error(
-                  "❌ Scheduled sync job failed:",
-                  result?.message || "Unknown error"
-                );
-              }
-            } catch (error) {
-              syncing.status = "failed";
-              syncing.completedAt = new Date();
-              syncing.duration = new Date() - new Date(syncing.startedAt);
-              syncing.save();
-              console.error("❌ Critical error in scheduled sync job:", error);
-            }
-          },
-          {
-            scheduled: true,
-            timezone: "UTC",
-          }
-        );
-
-        console.log("⏰ Cron job started - sync scheduled every 20 minutes");
-      } else if (process.env.VERCEL) {
-        console.log("⏰ Cron job skipped - running on Vercel");
-      } else if (syncCronJob) {
-        console.log("⏰ Cron job already running - skipping duplicate");
-      }
+      job()
+      setInterval(() => {
+         job()  
+   
+        console.log("✅ Cron job started - sync scheduled every 20 minutes");
+      }, 20 * 60 * 1000); // 20 minutes
+     
     })
     .catch((error) => {
       console.warn("⚠️ MongoDB connection failed:", error.message);
@@ -132,6 +78,108 @@ if (process.env.MONGODB_URI) {
 } else {
   console.warn("⚠️ No MONGODB_URI provided");
 }
+// Start MongoDB connection
+// if (process.env.MONGODB_URI) {
+//   console.log("Connecting to MongoDB...");
+//   database
+//     .connect()
+//     .then(() => {
+//       console.log("✅ MongoDB connected successfully");
+
+//       // Start cron job immediately after MongoDB connection
+//       if (!process.env.VERCEL && !syncCronJob) {
+//         console.log("🕐 Starting cron job...");
+
+//         SyncController.startSyncing()
+//           .then(async (result) => {
+//             const syncing = await SyncingModel.create({
+//               status: "completed",
+//               startedAt: new Date(),
+//               completedAt: new Date(),
+//               duration: null,
+//               errors: [],
+//               metadata: {},
+//             });
+//             syncing.save();
+//             console.log("✅ Cron job started - sync scheduled every 3 hours");
+//           })
+//           .catch(async (error) => {
+//             const syncing = await SyncingModel.create({
+//               status: "failed",
+//               startedAt: new Date(),
+//               completedAt: null,
+//               duration: null,
+//               errors: [],
+//               metadata: {
+//                 error: error.message,
+//               },
+//             });
+//             syncing.save();
+//             console.error("❌ Cron job failed to start:", error);
+//           });
+//         console.log("✅ Cron job started - sync scheduled every 3 hours");
+//         // Schedule sync job every 10 seconds
+//         syncCronJob = cron.schedule(
+//           "0 */3 * * *",
+//           async () => {
+//             //
+//             // Check if another sync is already running
+
+//             console.log("🔄 Executing scheduled sync job...");
+
+//             const syncing = await SyncingModel.create({
+//               status: "running",
+//               startedAt: new Date(),
+//               completedAt: null,
+//               duration: null,
+//               errors: [],
+//               metadata: {},
+//             });
+//             syncing.save();
+//             try {
+//               const result = await SyncController.startSyncing();
+//               syncing.status = result.success ? "completed" : "failed";
+//               syncing.completedAt = new Date();
+//               syncing.duration = new Date() - new Date(syncing.startedAt);
+//               syncing.save();
+//               if (result && result.success) {
+//                 console.log(
+//                   "✅ Scheduled sync job completed successfully:",
+//                   result.message
+//                 );
+//               } else {
+//                 console.error(
+//                   "❌ Scheduled sync job failed:",
+//                   result?.message || "Unknown error"
+//                 );
+//               }
+//             } catch (error) {
+//               syncing.status = "failed";
+//               syncing.completedAt = new Date();
+//               syncing.duration = new Date() - new Date(syncing.startedAt);
+//               syncing.save();
+//               console.error("❌ Critical error in scheduled sync job:", error);
+//             }
+//           },
+//           {
+//             scheduled: true,
+//             timezone: "UTC",
+//           }
+//         );
+
+//         console.log("⏰ Cron job started - sync scheduled every 20 minutes");
+//       } else if (process.env.VERCEL) {
+//         console.log("⏰ Cron job skipped - running on Vercel");
+//       } else if (syncCronJob) {
+//         console.log("⏰ Cron job already running - skipping duplicate");
+//       }
+//     })
+//     .catch((error) => {
+//       console.warn("⚠️ MongoDB connection failed:", error.message);
+//     });
+// } else {
+//   console.warn("⚠️ No MONGODB_URI provided");
+// }
 
 // Routes
 const indexRoutes = require("./routes/index");
